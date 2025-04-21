@@ -83,7 +83,7 @@ const filterMenus = (menus = [] as MenuProps['items']) => {
         return false
       }
     }
-    return true
+    return true;
   })
 }
 
