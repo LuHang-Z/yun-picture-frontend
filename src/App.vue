@@ -9,7 +9,7 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 // import {healthUsingGet} from "@/api/mainController.ts";
 // import {useLoginUserStore} from "@/stores/userLoginUserStore";
 
-// 已经改为在权限校验文件中获取
+// 已经改为在权限校验文件中获取了
 // const loginUserStore = useLoginUserStore()
 // loginUserStore.fetchLoginUser()
 
