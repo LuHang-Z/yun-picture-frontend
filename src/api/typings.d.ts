@@ -208,6 +208,11 @@ declare namespace API {
     tags?: string[]
   }
 
+  type PictureUploadRequest = {
+    fileUrl?: string
+    id?: number
+  }
+
   type PictureVO = {
     category?: string
     createTime?: string
@@ -237,6 +242,7 @@ declare namespace API {
   }
 
   type uploadPictureUsingPOSTParams = {
+    fileUrl?: string
     id?: number
   }
 
