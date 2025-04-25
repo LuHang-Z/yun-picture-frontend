@@ -3,14 +3,19 @@
     <h2 style="margin-bottom: 16px">
       {{ route.query?.id ? '修改图片' : '创建图片' }}
     </h2>
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间: <a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}}</a>
+    </a-typography-paragraph>
     <!-- 选择上传方式 -->
     <a-tabs v-model:activeKey="uploadType"
     >>
       <a-tab-pane key="file" tab="文件上传">
-        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+<!--        图片上传组件-->
+        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess"/>
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL 上传" force-render>
-        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+<!--        URL 图片上传组件-->
+        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess"/>
       </a-tab-pane>
     </a-tabs>
     <!--    图片信息表单-->
@@ -52,16 +57,24 @@
 
 <script setup lang="ts">
 import PictureUpload from "@/components/PictureUpload.vue";
-import {onMounted, reactive, ref} from "vue";
+import {computed, onMounted, reactive, ref} from "vue";
 import {userLoginUsingPost} from "@/api/userController";
 import {message} from "ant-design-vue";
 import {editPictureUsingPost, getPictureVoByIdUsingGet, listPictureTagCategoryUsingGet} from "@/api/pictureController";
 import {useRoute, useRouter} from "vue-router";
 import UrlPictureUpload from "@/components/UrlPictureUpload.vue";
 
+const router = useRouter();
+const route = useRoute()
+
 const picture = ref<API.PictureVO>();
 const pictureForm = reactive<API.PictureEditRequest>({})
 const uploadType = ref<'file' | 'url'>('file')
+
+// 空间id
+const spaceId = computed(() => {
+  return route.query?.spaceId;
+})
 
 /**
  * 图片上传成功
@@ -72,7 +85,6 @@ const onSuccess = (newPicture: API.PictureVO) => {
   pictureForm.name = newPicture.name;
 }
 
-const router = useRouter();
 
 /**
  * 表单提交
@@ -80,12 +92,13 @@ const router = useRouter();
  */
 const handleSubmit = async (values: any) => {
   const pictureId = picture.value.id
-  if(!pictureId){
+  if (!pictureId) {
     return;
   }
 
   const res = await editPictureUsingPost({
     id: pictureId,
+    spaceId: spaceId.value,
     ...values,
   })
   // 操作成功
@@ -93,7 +106,7 @@ const handleSubmit = async (values: any) => {
     message.success('创建成功')
     //跳转到图片详情页
     router.push({
-      path: '/picture/${pictureId}',
+      path: `/picture/${pictureId}`,
     })
   } else {
     message.error('创建失败，' + res.data.message)
@@ -132,7 +145,6 @@ onMounted(() => {
   getTagCategoryOptions()
 })
 
-const route = useRoute()
 
 // 获取老数据
 const getOldPicture = async () => {
