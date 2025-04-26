@@ -88,7 +88,7 @@ import {
 } from '@/api/pictureController.ts'
 import { formatSize } from '@/utils'
 import PictureList from '@/components/PictureList.vue'
-// import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import PictureSearchForm from '@/components/PictureSearchForm.vue'
 // import { ColorPicker } from 'vue3-colorpicker'
 // import 'vue3-colorpicker/style.css'
 // import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
