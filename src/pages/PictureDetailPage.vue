@@ -101,7 +101,7 @@ import ShareModal from '@/components/ShareModal.vue'
 import {userLoginUsingPost} from "@/api/userController";
 import {useLoginUserStore} from "@/stores/userLoginUserStore";
 
-// import { SPACE_PERMISSION_ENUM } from '@/constants/space.ts'
+import { SPACE_PERMISSION_ENUM } from '@/constants/space.ts'
 
 interface Props {
   id: string | number
