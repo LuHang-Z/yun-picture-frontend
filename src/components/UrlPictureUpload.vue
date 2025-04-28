@@ -11,10 +11,8 @@
 </template>
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {PlusOutlined, LoadingOutlined} from '@ant-design/icons-vue';
 import {message} from 'ant-design-vue';
-import type {UploadChangeParam, UploadProps} from 'ant-design-vue';
-import {uploadPictureByUrlUsingPost, uploadPictureUsingPost} from "@/api/pictureController";
+import {uploadPictureByUrlUsingPost} from "@/api/pictureController";
 
 interface Props {
   picture?: API.PictureVO

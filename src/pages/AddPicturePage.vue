@@ -10,14 +10,37 @@
     <a-tabs v-model:activeKey="uploadType"
     >>
       <a-tab-pane key="file" tab="文件上传">
-<!--        图片上传组件-->
+        <!--        图片上传组件-->
         <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess"/>
       </a-tab-pane>
       <a-tab-pane key="url" tab="URL 上传" force-render>
-<!--        URL 图片上传组件-->
+        <!--        URL 图片上传组件-->
         <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess"/>
       </a-tab-pane>
     </a-tabs>
+    <!-- 图片编辑 -->
+    <div v-if="picture" class="edit-bar">
+      <a-space size="middle">
+        <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
+        <a-button type="primary" :icon="h(FullscreenOutlined)" @click="doImagePainting">
+          AI 扩图
+        </a-button>
+      </a-space>
+      <ImageCropper
+        ref="imageCropperRef"
+        :imageUrl="picture?.url"
+        :picture="picture"
+        :spaceId="spaceId"
+        :space="space"
+        :onSuccess="onCropSuccess"
+      />
+      <ImageOutPainting
+        ref="imageOutPaintingRef"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onImageOutPaintingSuccess"
+      />
+    </div>
     <!--    图片信息表单-->
     <a-form v-if="picture" name="pictureForm" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item name="name" label="名称">
@@ -57,12 +80,15 @@
 
 <script setup lang="ts">
 import PictureUpload from "@/components/PictureUpload.vue";
-import {computed, onMounted, reactive, ref} from "vue";
-import {userLoginUsingPost} from "@/api/userController";
+import {computed, h, onMounted, reactive, ref, watchEffect} from "vue";
 import {message} from "ant-design-vue";
 import {editPictureUsingPost, getPictureVoByIdUsingGet, listPictureTagCategoryUsingGet} from "@/api/pictureController";
 import {useRoute, useRouter} from "vue-router";
 import UrlPictureUpload from "@/components/UrlPictureUpload.vue";
+import ImageCropper from '@/components/ImageCropper.vue'
+import {EditOutlined, FullscreenOutlined} from '@ant-design/icons-vue'
+import ImageOutPainting from '@/components/ImageOutPainting.vue'
+import {getSpaceVoByIdUsingGet} from '@/api/spaceController.ts'
 
 const router = useRouter();
 const route = useRoute()
@@ -169,6 +195,52 @@ onMounted(() => {
   getOldPicture()
 })
 
+// ----- 图片编辑器引用 ------
+const imageCropperRef = ref()
+
+// 编辑图片
+const doEditPicture = async () => {
+  imageCropperRef.value?.openModal()
+}
+
+// 编辑成功事件
+const onCropSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
+
+// ----- AI 扩图引用 -----
+const imageOutPaintingRef = ref()
+
+// 打开 AI 扩图弹窗
+const doImagePainting = async () => {
+  imageOutPaintingRef.value?.openModal()
+}
+
+// AI 扩图保存事件
+const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
+
+// 获取空间信息
+const space = ref<API.SpaceVO>()
+
+// 获取空间信息
+const fetchSpace = async () => {
+  // 获取数据
+  if (spaceId.value) {
+    const res = await getSpaceVoByIdUsingGet({
+      id: spaceId.value,
+    })
+    if (res.data.code === 0 && res.data.data) {
+      space.value = res.data.data
+    }
+  }
+}
+
+watchEffect(() => {
+  fetchSpace()
+})
+
 
 </script>
 
@@ -176,5 +248,10 @@ onMounted(() => {
 #addPicturePage {
   max-width: 720px;
   margin: 0 auto;
+}
+
+#addPicturePage .edit-bar {
+  text-align: center;
+  margin: 16px 0;
 }
 </style>
